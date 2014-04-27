@@ -1,0 +1,189 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Highcharts Example</title>
+		
+		
+		<!-- 1. Add these JavaScript inclusions in the head of your page -->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.js"></script>
+		<script type="text/javascript" src="/hc/highcharts.js"></script>
+		
+		
+		<!-- 2. Add the JavaScript to initialize the chart on document ready -->
+		<script>
+		var chart1, chart2, chart3;
+		function requestData1() {
+			$.getJSON('sentiment.php', 
+				function(point) {
+					var series = chart1.series[0];
+					shift = series.data.length >= 60; // shift if the series is longer than 60 points
+		
+					// add the point
+					chart1.series[0].addPoint(point, true, shift);
+					
+					// call it again after one second
+					setTimeout(requestData1, 5000);	
+				}
+			);
+		}
+		
+		function requestData2() {
+			$.getJSON('sentiment.php?win=60', 
+				function(point) {
+					var series = chart2.series[0];
+					shift = series.data.length >= 60; // shift if the series is longer than 60 points
+		
+					// add the point
+					chart2.series[0].addPoint(point, true, shift);
+					
+					// call it again after one second
+					setTimeout(requestData2, 60000);	
+				}
+			);
+		}
+		
+		function requestData3() {
+			$.getJSON('sentiment.php?win=900', 
+				function(point) {
+					var series = chart3.series[0];
+					shift = series.data.length >= 96; // shift if the series is longer than 60 points
+		
+					// add the point
+					chart3.series[0].addPoint(point, true, shift);
+					
+					// call it again after one second
+					setTimeout(requestData3, 900000);	
+				}
+			);
+		}
+			
+		$(document).ready(function() {
+
+			var options1 = {
+        		chart: {
+            		renderTo: 'container',
+            		type: 'spline'/*,
+            		events: {
+						load: requestData
+					}*/
+        		},
+        		title: {
+					text: 'Live Twitter Sentiment (5s intevals)'
+				},
+				xAxis: {
+					type: 'datetime',
+					tickPixelInterval: 150,
+					maxZoom: 60 * 1000
+				},
+				yAxis: {
+					minPadding: 0.2,
+					maxPadding: 0.2,
+					//min: -0.4,
+					//max: 0.6,
+					title: {
+						text: 'Sentiment',
+						margin: 80
+					}
+				},
+        		series: [{}]
+    		};
+
+    		$.getJSON('sentiment.php?p=60&win=5', function(data) {
+        		options1.series[0].data = data;
+        		options1.series[0].name = "Sentiment";
+        		chart1 = new Highcharts.Chart(options1);
+        		setTimeout(requestData1, 5000);
+    		});
+    		
+    		
+    		//Chart 2
+    		var options2 = {
+        		chart: {
+            		renderTo: 'container2',
+            		type: 'spline'/*,
+            		events: {
+						load: requestData
+					}*/
+        		},
+        		title: {
+					text: 'Live Twitter Sentiment (1m intevals)'
+				},
+				xAxis: {
+					type: 'datetime',
+					tickPixelInterval: 150,
+					maxZoom: 60 * 1000
+				},
+				yAxis: {
+					minPadding: 0.2,
+					maxPadding: 0.2,
+					//min: -0.4,
+					//max: 0.6,
+					title: {
+						text: 'Sentiment',
+						margin: 80
+					}
+				},
+        		series: [{}]
+    		};
+
+    		$.getJSON('sentiment.php?p=60&win=60', function(data) {
+        		options2.series[0].data = data;
+        		options2.series[0].name = "Sentiment";
+        		chart2 = new Highcharts.Chart(options2);
+        		setTimeout(requestData2, 60000);
+    		});
+    		
+    		
+    		//Chart 3
+    		var options3 = {
+        		chart: {
+            		renderTo: 'container3',
+            		type: 'spline'/*,
+            		events: {
+						load: requestData
+					}*/
+        		},
+        		title: {
+					text: 'Live Twitter Sentiment (15m intevals)'
+				},
+				xAxis: {
+					type: 'datetime',
+					tickPixelInterval: 150,
+					maxZoom: 96 * 1000
+				},
+				yAxis: {
+					minPadding: 0.2,
+					maxPadding: 0.2,
+					//min: -0.4,
+					//max: 0.6,
+					title: {
+						text: 'Sentiment',
+						margin: 80
+					}
+				},
+        		series: [{}]
+    		};
+
+    		$.getJSON('sentiment.php?p=96&win=900', function(data) {
+        		options3.series[0].data = data;
+        		options3.series[0].name = "Sentiment";
+        		chart3 = new Highcharts.Chart(options3);
+        		setTimeout(requestData3, 900000);
+    		});
+		});
+		</script>
+		
+	</head>
+	<body>
+		
+		<!-- 3. Add the container -->
+		<div id="container" style="width: 100%; height: 480px; margin: 20 auto"></div>
+		<div id="container2" style="width: 100%; height: 480px; margin: 20 auto"></div>
+		<div id="container3" style="width: 100%; height: 480px; margin: 20 auto"></div>
+			
+		</div>
+	</body>
+</html>
+
